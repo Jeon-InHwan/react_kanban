@@ -4,6 +4,7 @@ import DraggableCard from "./DraggableCard";
 import { useForm } from "react-hook-form";
 import { IToDo, toDoState } from "../atoms";
 import { useSetRecoilState } from "recoil";
+import Trashcan from "./Transhcan";
 
 interface IBoardProps {
   toDos: IToDo[];
@@ -25,7 +26,7 @@ const Wrapper = styled.div`
   padding-top: 10px;
   background-color: ${(props) => props.theme.boardColor};
   border-radius: 5px;
-  min-height: 300px;
+  min-height: 380px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -41,9 +42,9 @@ const Title = styled.h2`
 const Area = styled.div<IAreaProps>`
   background-color: ${(props) =>
     props.isDraggingOver
-      ? "#dfe6e9"
-      : props.isDraggingFromThisWith
       ? "#b2bec3"
+      : props.isDraggingFromThisWith
+      ? "#dfe6e9"
       : "transparent"};
   flex-grow: 1;
   transition: background-color 0.3s ease-in-out;
@@ -51,9 +52,16 @@ const Area = styled.div<IAreaProps>`
 `;
 
 const Form = styled.form`
+  text-align: center;
   width: 100%;
   input {
-    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 30px;
+    width: 80%;
+    height: 40px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 15px;
   }
 `;
 
@@ -68,7 +76,7 @@ function Board({ toDos, boardId }: IBoardProps) {
     setToDos((allBoards) => {
       return {
         ...allBoards,
-        [boardId]: [...allBoards[boardId], newToDo],
+        [boardId]: [newToDo, ...allBoards[boardId]],
       };
     });
     setValue("toDo", "");
@@ -100,6 +108,7 @@ function Board({ toDos, boardId }: IBoardProps) {
               />
             ))}
             {provided.placeholder}
+            <Trashcan />
           </Area>
         )}
       </Droppable>

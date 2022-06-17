@@ -1,9 +1,10 @@
 import React from "react";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import { useRecoilState } from "recoil";
+import { DragDropContext, DropResult, DragStart } from "react-beautiful-dnd";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { toDoState } from "./atoms";
+import { toDoState, TrashCanState } from "./atoms";
 import Board from "./Components/Board";
+import Trashcan from "./Components/Transhcan";
 
 const Wrapper = styled.div`
   display: flex;
@@ -19,31 +20,32 @@ const Boards = styled.div`
   justify-content: center;
   align-items: flex-start;
   width: 100%;
-  gap: 10px;
+  gap: 20px;
 `;
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const setTrashCan = useSetRecoilState(TrashCanState);
+  const onBeforeDragStart = (info: DragStart) => {
+    if (info.type === "DEFAULT") setTrashCan(true);
+  };
 
   const onDragEnd = (info: DropResult) => {
     const { destination, draggableId, source } = info;
+    setTrashCan(false);
     if (!destination) {
       return;
     }
 
-    if (destination?.droppableId === source.droppableId) {
-      // same board movement
-      setToDos((allBoards) => {
-        const boardCopy = [...allBoards[source.droppableId]];
-        const taskObj = boardCopy[source.index];
-        // 1) Delete the target item on source.index
-        boardCopy.splice(source.index, 1);
-        // 2) put back the target item on desination.index
-        boardCopy.splice(destination?.index, 0, taskObj);
+    console.log(destination.droppableId);
 
+    if (destination.droppableId === "trashcan") {
+      setToDos((allBoards) => {
+        const sourceBoard = [...allBoards[source.droppableId]];
+        sourceBoard.splice(source.index, 1);
         return {
           ...allBoards,
-          [source.droppableId]: boardCopy,
+          [source.droppableId]: sourceBoard,
         };
       });
     }
@@ -63,10 +65,30 @@ function App() {
         };
       });
     }
+
+    if (destination?.droppableId === source.droppableId) {
+      // same board movement
+      setToDos((allBoards) => {
+        const boardCopy = [...allBoards[source.droppableId]];
+        const taskObj = boardCopy[source.index];
+        // 1) Delete the target item on source.index
+        boardCopy.splice(source.index, 1);
+        // 2) put back the target item on desination.index
+        boardCopy.splice(destination?.index, 0, taskObj);
+
+        return {
+          ...allBoards,
+          [source.droppableId]: boardCopy,
+        };
+      });
+    }
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext
+      onDragEnd={onDragEnd}
+      onBeforeDragStart={onBeforeDragStart}
+    >
       <Wrapper>
         <Boards>
           {Object.keys(toDos).map((boardId) => (
@@ -74,6 +96,7 @@ function App() {
           ))}
         </Boards>
       </Wrapper>
+      <Trashcan></Trashcan>
     </DragDropContext>
   );
 }
