@@ -1,0 +1,11 @@
+{
+  "files": {
+    "main.js": "/react_kanban/static/js/main.878dd05f.js",
+    "static/media/trashcan.png": "/react_kanban/static/media/trashcan.04d9bdf69f84304eed48.png",
+    "index.html": "/react_kanban/index.html",
+    "main.878dd05f.js.map": "/react_kanban/static/js/main.878dd05f.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.878dd05f.js"
+  ]
+}
